@@ -28,8 +28,6 @@ app.UseSerilogRequestLogging(options =>
     };
 });
 
-//app.UseRouting();
-
 app.MapGet("/", () => "Hello, World!");
 
 app.Run();
