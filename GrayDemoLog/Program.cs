@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +30,12 @@ app.UseSerilogRequestLogging(options =>
     };
 });
 
-app.MapGet("/", () => "Hello, World!");
+app.MapGet("/",
+    ([FromServices] ILogger<Program> logger) =>
+    {
+        logger.LogInformation("Hello from main page!");
+
+        return Results.Ok("Hello, World!");
+    });
 
 app.Run();

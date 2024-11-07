@@ -69,11 +69,23 @@ services:
       - "graylog_journal:/usr/share/graylog/data/journal"
     networks:
       - backend
-    restart: "on-failure"
+    restart: on-failure
+
+  fluent-bit:
+    container_name: fluent-bit
+    image: fluent/fluent-bit
+    ports:
+      - 24224:24224
+      - 24224:24224/udp
+    volumes:
+      - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+    networks:
+      - backend
+    restart: on-failure
 
   graydemolog:
     container_name: graydemolog
-    image: ${DOCKER_REGISTRY-}graydemolog
+    image: ${DOCKER_REGISTRY:-graydemolog}
     build:
       context: .
       dockerfile: GrayDemoLog/Dockerfile
@@ -91,6 +103,13 @@ services:
     depends_on:
       graylog:
         condition: service_started
+      fluent-bit:
+        condition: service_started
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        tag: graydemolog
     networks:
       - backend
     restart: unless-stopped
